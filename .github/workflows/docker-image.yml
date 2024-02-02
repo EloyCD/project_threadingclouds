@@ -24,6 +24,6 @@ jobs:
           context: ./app
           file: ./Dockerfile  
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/myimagesthreadingclouds:${{ env.GITHUB_SHA }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/myimagesthreadingclouds:${{ github.sha }}
 
 
