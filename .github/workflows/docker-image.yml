@@ -3,7 +3,7 @@ name: Build and Publish Docker image
 on:
   push:
     branches:
-      - main  # or your default branch
+      - main  
 
 jobs:
   build-and-publish:
@@ -21,9 +21,9 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: .  # Assumes your Dockerfile is in the root directory
-          file: ./Dockerfile  # Path to your Dockerfile
+          context: ./app
+          file: ./Dockerfile  
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/myimagesthreadingclouds:latest 
+          tags: ${{ secrets.DOCKER_USERNAME }}/myimagesthreadingclouds:${{ env.GITHUB_SHA }}
 
 
