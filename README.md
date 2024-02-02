@@ -1,3 +1,3 @@
-## PIPELINE DE DESPLIEGUE
+## DEPLOYMENT PIPELINE
 
-Al realizar cambios en la aplicación y hacer push, se genera una nueva imagen con un tag relacionado al commit de github, ese tag lo pegamos en el fichero deploy.yaml, relizando un nuevo push, por lo cual Argocd se sincroniza automáticamente.
+When we make changes in the application and push, a new image is generated with a tag related to the github commit, this tag is pasted in the deploy.yaml file, making a new push, so Argocd is automatically synchronized.
