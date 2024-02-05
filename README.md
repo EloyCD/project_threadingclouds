@@ -1,34 +1,258 @@
 
-## Overview Technical Development
+## Tools
 
-**_cluster installation with Kind_**:
+- Docker: For containerization and running Kubernetes clusters. 
 
-Kind (Kubernetes IN Docker) is a tool that facilitates running Kubernetes clusters inside Docker containers, ideal for development, testing and CI/CD. It requires Docker and optionally kubectl as prerequisites. Kind's installation is simple, and you can run kind create cluster to get a functional cluster in minutes. This allows developers and DevOps teams to work with Kubernetes efficiently and without the need for complex configurations or dedicated resources, making Kind a practical solution for local development environments and automated testing.
+- Kind (Kubernetes IN Docker): For local Kubernetes cluster setup.
+- Helm: For package management in Kubernetes.
+- Prometheus, Grafana, and ArgoCD: For monitoring and deployment management.
+- Java and Spring Boot: For application development.
+- Dockerfile: For creating Docker images.
+- GitHub Actions: For CI/CD pipelines.
+ - ArgoCD: For continuous deployment.
 
-**_Installation using helm from Prometheus, Grafana and Argocd_**:
+ ## Development
 
+**_Setting Up the Environment_**:
 
-To install Prometheus, Grafana and ArgoCD on a Kubernetes cluster using Helm, you first need to have Helm installed on your machine. Starting with Prometheus, you can add the Prometheus Helm repository and then install it using the helm install command. Similarly, for Grafana, you add its repository and install it. ArgoCD is also installed in a similar way, by adding its Helm repository and running the installation. It is important to configure each Helm chart according to the specific needs of the environment before installation. This process allows you to quickly deploy powerful monitoring and deployment management tools in your cluster, making it easy to centrally manage applications and view metrics.
+- Ensure Docker is installed and running.
+- Install kubectl for Kubernetes command-line tool.
 
+**_Creating a Kubernetes Cluster with Kind_**
 
-**_Configuring the Java application with Spring boot_:**
-
-Configuring an application with Spring Boot is a streamlined process that leverages auto-configuration and convention over configuration to minimize startup effort. When creating a Spring Boot application, you start by including the necessary dependencies in the pom.xml file for Maven or build.gradle for Gradle, focusing the configuration on the application.properties or application.yml file, where you can specify properties such as the server port, database settings, and more. Spring Boot automatically configures the application components based on the added dependencies, but allows full customization through annotations in the application's main class or through specific configuration beans. This approach facilitates rapid development of robust and easily deployable applications, making Spring Boot a popular choice for modern microservices and web application development.
-
-
-**_Dockerfile creation_:**
-
-Creating a Dockerfile involves defining a series of step-by-step instructions to build a Docker image that encapsulates an application and its environment. You start by specifying a base image with FROM, followed by setting up the environment with instructions such as ENV for environment variables and RUN to execute commands that install dependencies. You use COPY or ADD to move files from the local system to the container. WORKDIR sets the working directory for the instructions that follow. EXPOSE informs Docker which ports the application will use. CMD or ENTRYPOINT defines the default command to be executed when the container is started. This process allows you to package applications efficiently, ensuring consistency between development, test and production environments, simplifying deployment and application scalability.
-
-
-**_Creation of Github actions pipeline_**:
-
-Creating a pipeline with GitHub Actions involves defining workflows in YAML files within the .github/workflows directory of your repository. Each workflow specifies a series of jobs that run automatically on certain events, such as push or pull requests. You start with the name declaration for your workflow and use the on event to define when it fires. Jobs within a workflow are composed of steps that can execute reusable commands, scripts or actions created by the community. For example, you can set up a pipeline to automate testing, packaging, and deployment of applications each time the main branch is committed. This tool provides a powerful and flexible way to automate the software development lifecycle directly from GitHub, facilitating continuous integration and delivery (CI/CD) without the need for external services.
+- Create a cluster using kind create cluster.
 
 
-**_Deployment Pipeline with argoCD_**
+**_Installing Helm and Setting Up Charts_**
 
-When we make changes in the application and push, a new image is generated with a tag related to the github commit, this tag is pasted in the deploy.yaml file, making a new push, so Argocd is automatically synchronized.
+- Install Helm if not already available.
+
+**_Create a Terraform Configuration File (main.tf) for each of the components (Prometheus, Grafana, ArgoCD)_**.
+
+- Prometheus: Use the Helm module to install Prometheus. You'll need to add the Helm chart for Prometheus to your configuration.
+
+- Grafana: Similar to Prometheus, use the Helm module to install Grafana.
+
+- Again, use the Helm module to install ArgoCD in your cluster.
+
+**_Apply Your Configuration_**:
+
+- Initialize Terraform with terraform init to prepare your environment.
+
+- Apply your configuration with terraform apply. Terraform will create the resources on your Kubernetes cluster based on the provided definitions.
+
+```
+terraform {
+  required_providers {
+    kind = {
+        source = "tehcyx/kind"
+        version = "0.0.13"
+    }
+  }
+}
+
+# Configure the Kind Provider
+provider "kind" {}
+
+# Create a cluster
+resource "kind_cluster" "default" {
+    name = "test-cluster"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = "./test-cluster-config"
+  }
+  
+}
+
+resource "helm_release" "grafana" {
+  name       = "grafana"
+  repository = "https://grafana.github.io/helm-charts"
+  chart      = "grafana"
+
+}
+
+resource "helm_release" "prometheus" {
+  name       = "prometheus"
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "prometheus"
+
+}
+
+resource "helm_release" "argocd" {
+  name       = "argocd"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argo-cd"
+
+}
+```
+
+**_Configuring a Java Application with Spring Boot_**:
+
+- Initialize a Spring Boot project with required dependencies.
+
+```
+
+package com.example.demo;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoApplication.class, args);
+	}
+
+}
+
+```
+
+- Use application.properties or application.yml for configuration settings.
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: myprojecthreadingclouds
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector: 
+    matchLabels:
+      app:  test
+  template:
+    metadata:
+      labels:
+        app:  test
+    spec:
+    
+      containers: 
+      - image: eloycd/myimagesthreadingclouds:e0f538134569887649e6cd7fd5aad2f14e90950b
+        imagePullPolicy: Always
+        name:  myprojecthreadingclouds
+        ports:
+        - containerPort: 8080
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: myprojecthreadingclouds
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: test
+
+```
+
+**_Packaging the Application with Docker_**:
+
+- Create a Dockerfile in your project root.
+- Specify base image, environment variables, dependencies, copy application files, expose ports, and define the entry point.
+- Build the Docker image: docker build -t [IMAGE_NAME]:[TAG] .
+
+```
+FROM eclipse-temurin:17-jdk-jammy AS build
+ENV HOME=/usr/app
+RUN mkdir -p $HOME
+WORKDIR $HOME
+ADD . $HOME
+RUN --mount=type=cache,target=/root/.m2 ./mvnw -f $HOME/pom.xml clean package
+
+#
+# Package stage
+#
+FROM eclipse-temurin:17-jre-jammy 
+ARG JAR_FILE=/usr/app/target/*.jar
+COPY --from=build $JAR_FILE /app/runner.jar
+EXPOSE 8080
+ENTRYPOINT java -jar /app/runner.jar
+
+```
+
+
+**_Automating Deployment with GitHub Actions_**:
+
+- In your GitHub repository, create a workflow under .github/workflows with YAML syntax.
+
+```
+name: Build and Publish Docker image
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./app
+          file: ./app/Dockerfile  
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/myimagesthreadingclouds:${{ github.sha }}
+
+```
+
+
+
+- Define triggers (e.g., on push to main branch), jobs, steps, and actions (e.g., build, test, deploy).
+
+![alt text](img/imagen1.png)
+
+**_Continuous Deployment with ArgoCD_**:
+
+- After pushing changes, ensure your Docker image is updated and tagged appropriately.
+
+- Update deploy.yaml in your repository with the new image tag.
+
+![alt text](img/imagen2.png)
+
+- ArgoCD will detect changes and synchronize, deploying the new version automatically.
+
+![alt text](img/imagen3.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
