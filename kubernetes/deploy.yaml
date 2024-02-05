@@ -15,7 +15,7 @@ spec:
     spec:
     
       containers: 
-      - image: eloycd/myimagesthreadingclouds:c037f6e73c114c4068fe1c7a25dcab52b5b38747
+      - image: eloycd/myimagesthreadingclouds:e0f538134569887649e6cd7fd5aad2f14e90950b
         imagePullPolicy: Always
         name:  myprojecthreadingclouds
         ports:
